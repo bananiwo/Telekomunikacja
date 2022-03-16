@@ -13,9 +13,8 @@ def decToBin(a):
 
 def zakodujSlowa(slowaMatr, H):
     iloscBitowParzystosci = len(H[0]) - 8
-    print("iloscBitowParzystosci: %d" %iloscBitowParzystosci)
     slowaZakodowaneMatrix = copy.deepcopy(slowaMatr)
-    counter = 0
+
     for s in slowaZakodowaneMatrix:
         bityParzystosci = [0] * iloscBitowParzystosci # inicjacja listy zerami
         for i in range(8):
@@ -23,34 +22,50 @@ def zakodujSlowa(slowaMatr, H):
 
             for j in range(iloscBitowParzystosci):
                 bityParzystosci[j] += s[i] * H[j][i]
-                # print(bityParzystosci[j])
 
-
-            # print("----------")
-            # print(bityParzystosci)
         for bp in bityParzystosci:
             s.append(bp % 2)
     return slowaZakodowaneMatrix
 
 def odleglosc(slowo1, slowo2):
     suma = 0
-    for i in range(8):
+    for i in range(len(slowo1)):
         suma += abs(slowo1[i] - slowo2[i])
-    return suma;
+    return suma
 
-def minimalnaOdleglosc(slowa):
-    minOdleglosc = 8
-    for i in range (256):
-        for j in range (256):
-            if(i == j):
+def rozkladOdleglosci(slowa):
+    output = {}
+
+    #stworzenie slownika
+    for i in range(len(slowa[0]) + 1):
+        output[i] = 0
+
+    #wypelnienie slownika 256*256=65536 elementow
+    for i in range(256):
+        for j in range(256):
+            if i == j:
                 continue
 
             odl = odleglosc(slowa[i], slowa[j])
-            if(odl < minOdleglosc):
+            output[odl] += 1
+
+    return output
+
+def minimalnaOdleglosc(slowa):
+    minOdleglosc = 8
+
+    for i in range(256):
+        for j in range(256):
+            if i == j:
+                continue
+            odl = odleglosc(slowa[i], slowa[j])
+            if odl < minOdleglosc:
                 minOdleglosc = odl
+
     return minOdleglosc
 
-def printSlowaZakowodane(slowa):
+# zakodowane na sztywno dziala tylko dla 4 bitów parzystości
+def printSlowaZakodowane(slowa):
     counter = 0
     for slowo in slowa:
         print("%3d: [%d, %d, %d, %d, %d, %d, %d, %d,  %d, %d, %d, %d]" % (counter,slowo[0], slowo[1],slowo[2],slowo[3],slowo[4],slowo[5],slowo[6],slowo[7],slowo[8],slowo[9],slowo[10],slowo[11]))
@@ -85,8 +100,11 @@ H = ([[0, 1, 1, 1, 0, 1, 1, 0,    1, 0, 0, 0],
 
 
 slowaZakodowane = zakodujSlowa(slowaMatrix, H)
+printSlowaZakodowane(slowaZakodowane)
+
 minOdleglosc = minimalnaOdleglosc(slowaZakodowane)
 
-
-printSlowaZakowodane(slowaZakodowane)
+print("Ilosc bitow parzystosci: %d" % (len(H[0]) - 8))
 print("Minimalna odleglosc: %d" % minOdleglosc)
+print("Rozkład odległosci zakodowanych słów w formacie (odleglość: liczba wystąpień)")
+print(rozkladOdleglosci(slowaZakodowane))
