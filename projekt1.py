@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 import copy
+import numpy as np
 
 def decToBin(a):
     bnr = bin(a).replace('0b', '')
@@ -10,20 +11,41 @@ def decToBin(a):
     return bnr
 
 
+# def zakodujSlowa(slowaMatr, H):
+#     iloscBitowParzystosci = len(H[0]) - 8
+#     slowaZakodowaneMatrix = copy.deepcopy(slowaMatr)
+#
+#     for s in slowaZakodowaneMatrix:
+#         bityParzystosci = [0] * iloscBitowParzystosci  # inicjacja listy zerami
+#         for i in range(8):
+#
+#             for j in range(iloscBitowParzystosci):
+#                 bityParzystosci[j] += s[i] * H[j][i]
+#
+#         for bp in bityParzystosci:
+#             s.append(bp % 2)
+#     return slowaZakodowaneMatrix
+
 def zakodujSlowa(slowaMatr, H):
-    iloscBitowParzystosci = len(H[0]) - 8
-    slowaZakodowaneMatrix = copy.deepcopy(slowaMatr)
+    slowaZakodowaneMatrix = []
 
-    for s in slowaZakodowaneMatrix:
-        bityParzystosci = [0] * iloscBitowParzystosci  # inicjacja listy zerami
-        for i in range(8):
+    for s in slowaMatr:
+        slowaZakodowaneMatrix.append(zakodujJednoSlowo(s, H))
 
-            for j in range(iloscBitowParzystosci):
-                bityParzystosci[j] += s[i] * H[j][i]
-
-        for bp in bityParzystosci:
-            s.append(bp % 2)
     return slowaZakodowaneMatrix
+
+def zakodujJednoSlowo(slowo, H):
+    iloscBitowParzystosci = len(H[0]) - 8
+    zakodowaneSlowo = copy.deepcopy(slowo)
+    bityParzystosci = [0] * iloscBitowParzystosci  # inicjacja listy zerami
+    for i in range(8):
+        for j in range(iloscBitowParzystosci):
+            bityParzystosci[j] += slowo[i] * H[j][i]
+
+    for bp in bityParzystosci:
+        zakodowaneSlowo.append(bp % 2)
+
+    return zakodowaneSlowo
 
 
 def odleglosc(slowo1, slowo2):
@@ -75,12 +97,38 @@ def printSlowaZakodowane(slowa):
             print("%3d: [%d, %d, %d, %d, %d, %d, %d, %d,  %d, %d, %d, %d]" % (
             counter, slowo[0], slowo[1], slowo[2], slowo[3], slowo[4], slowo[5], slowo[6], slowo[7], slowo[8], slowo[9],
             slowo[10], slowo[11]))
-        if iloscBitowParzystosci == 3:
-            print("%3d: [%d, %d, %d, %d, %d, %d, %d, %d,  %d, %d, %d]" % (
-            counter, slowo[0], slowo[1], slowo[2], slowo[3], slowo[4], slowo[5], slowo[6], slowo[7], slowo[8], slowo[9],
-            slowo[10]))
+
 
         counter += 1
+
+def czySlowoZakodowanePoprawnie(slowo, H):
+    iloczyn = np.matmul(H, slowo) % 2
+    wynik = True
+    for bit in iloczyn:
+        if bit == 1:
+            wynik = False
+            break
+
+    return wynik
+
+def numerBlednejKolumny(slowo, H):
+    wynik = -1
+    macierzHE = np.matmul(H, slowo) % 2
+    iloscKolumn = len(H[0])
+    for i in range(iloscKolumn):
+        # H[:,i] zwraca i-ta kolumne macierzy H
+        # any() zwraca falsz jesli wszystkie elementy macierzy sa 0
+        if not any(macierzHE - H[:, i]):
+            wynik = i
+            break
+
+    return wynik
+
+def korekcjaPojedynczegoBledu(slowo, H):
+    pozycjaZlegoBitu = numerBlednejKolumny(slowo, H)
+    wynik = copy.deepcopy(slowo)
+    wynik[pozycjaZlegoBitu] = (wynik[pozycjaZlegoBitu] + 1) % 2
+    return wynik
 
 
 # 256 kolejnych liczb dziesiatkowo
@@ -101,21 +149,45 @@ for k in range(256):
         s.append(int(slowaBin[k][i]))
     slowaMatrix.append(s)
 
-H = ([[1, 1, 1, 0, 1, 0, 1, 1, 1, 0, 0],
-      [1, 0, 1, 1, 0, 1, 1, 1, 0, 1, 0],
-      [0, 1, 1, 0, 1, 1, 1, 1, 0, 0, 1]])
 
-# H = ([[0, 1, 1, 1, 0, 1, 1, 0,    1, 0, 0, 0],
-#       [1, 0, 1, 1, 0, 0, 1, 1,    0, 1, 0, 0],
-#       [1, 1, 0, 1, 1, 0, 0, 1,    0, 0, 1, 0],
-#       [1, 1, 1, 0, 1, 1, 0, 0,    0, 0, 0, 1]])
+H = np.asarray([[0, 1, 1, 1, 0, 1, 1, 0,   1, 0, 0, 0],
+                [1, 0, 1, 1, 0, 0, 1, 1,   0, 1, 0, 0],
+                [1, 1, 0, 1, 1, 0, 0, 1,   0, 0, 1, 0],
+                [1, 1, 1, 0, 1, 1, 0, 0,   0, 0, 0, 1]])
 
 
 slowaZakodowane = zakodujSlowa(slowaMatrix, H)
 minOdleglosc = minimalnaOdleglosc(slowaZakodowane)
 
-printSlowaZakodowane(slowaZakodowane)
-print("Ilosc bitow parzystosci: %d" % (len(H[0]) - 8))
-print("Minimalna odleglosc: %d" % minOdleglosc)
-print("Rozkład odległosci zakodowanych słów w formacie (odleglość: liczba wystąpień)")
-print(rozkladOdleglosci(slowaZakodowane))
+# printSlowaZakodowane(slowaZakodowane)
+# print("Ilosc bitow parzystosci: %d" % (len(H[0]) - 8))
+# print("Minimalna odleglosc: %d" % minOdleglosc)
+# print("Rozkład odległosci zakodowanych słów w formacie {odleglość: liczba wystąpień}")
+# print(rozkladOdleglosci(slowaZakodowane))
+
+
+
+# ---------------------- KODOWANIE SLOWA ----------------------
+
+print("\n--- KODOWANIE SLOWA ---")
+slowo = [1, 1, 1, 1, 1, 1, 0, 1]
+print("Slowo:\n", slowo)
+slowoZakodowane = zakodujJednoSlowo(slowo, H)
+print("Po zakodowaniu:\n", slowoZakodowane)
+print("Odebrane slowo jest poprawne?", bool(czySlowoZakodowanePoprawnie(slowoZakodowane, H)))
+
+# ---------------------- WYKRYCIE I KOREKCJA POJEDYNCZEGO BLEDU BITOWEGO ----------------------
+
+print("\n--- WYKRYCIE I KOREKCJA POJEDYNCZEGO BLEDU BITOWEGO ---")
+slowoDoZakodowania = [1, 1, 1, 1, 1, 1, 0, 1]
+# slowoZakodowane = zakodujJednoSlowo(slowoDoZakodowania, H)
+slowoPoprawne =    [1, 1, 1, 1, 1, 1, 0, 1,  0, 0, 1, 1]
+slowoNiepoprawne = [1, 1, 1, 1, 1, 1, 0, 0,  0, 0, 1, 1]  # przeklamany piaty najmlodszy (od prawej) bit
+print("Slowo z przeklamanym bitem:\n", slowoNiepoprawne)
+print("Odebrane slowo jest poprawne?", bool(czySlowoZakodowanePoprawnie(slowoNiepoprawne, H)))
+print("Przeklamany jest bit (od lewej, od 0): %d" % numerBlednejKolumny(slowoNiepoprawne, H))
+poprawione = korekcjaPojedynczegoBledu(slowoNiepoprawne, H)
+print("Slowo po poprawie:\n", poprawione)
+print("Czy teraz jest poprawne?", poprawione == slowoPoprawne)
+
+# ----------------------------------------------------------------------------------------------
