@@ -10,22 +10,6 @@ def decToBin(a):
         bnr = x[::-1]
     return bnr
 
-
-# def zakodujSlowa(slowaMatr, H):
-#     iloscBitowParzystosci = len(H[0]) - 8
-#     slowaZakodowaneMatrix = copy.deepcopy(slowaMatr)
-#
-#     for s in slowaZakodowaneMatrix:
-#         bityParzystosci = [0] * iloscBitowParzystosci  # inicjacja listy zerami
-#         for i in range(8):
-#
-#             for j in range(iloscBitowParzystosci):
-#                 bityParzystosci[j] += s[i] * H[j][i]
-#
-#         for bp in bityParzystosci:
-#             s.append(bp % 2)
-#     return slowaZakodowaneMatrix
-
 def zakodujSlowa(slowaMatr, H):
     slowaZakodowaneMatrix = []
 
@@ -47,6 +31,17 @@ def zakodujJednoSlowo(slowo, H):
 
     return zakodowaneSlowo
 
+# def kodowanieMacierza(slowo, H):
+#     iloscBitowParzystosci = len(H[0]) - 8
+#     zakodowaneSlowo = copy.deepcopy(slowo)
+#     slowoArr = np.pad(np.asarray(slowo), (0, iloscBitowParzystosci), 'constant')
+#
+#     print(slowoArr)
+#     macierzZerowa = np.asarray([0, 0, 0, 0])
+#     slowoArrInv = np.invert(slowoArr)
+#     print(slowoArrInv)
+#
+#     return zakodowaneSlowo
 
 def odleglosc(slowo1, slowo2):
     suma = 0
@@ -156,15 +151,16 @@ H = np.asarray([[0, 1, 1, 1, 0, 1, 1, 0,   1, 0, 0, 0],
                 [1, 1, 1, 0, 1, 1, 0, 0,   0, 0, 0, 1]])
 
 
+# ---------------------- SPRAWDZENIE MACIERZY H ----------------------
+print("\n--- SPRAWDZENIE MACIERZY H ---")
 slowaZakodowane = zakodujSlowa(slowaMatrix, H)
 minOdleglosc = minimalnaOdleglosc(slowaZakodowane)
 
 # printSlowaZakodowane(slowaZakodowane)
-# print("Ilosc bitow parzystosci: %d" % (len(H[0]) - 8))
-# print("Minimalna odleglosc: %d" % minOdleglosc)
+print("Ilosc bitow parzystosci: %d" % (len(H[0]) - 8))
+print("Minimalna odleglosc: %d" % minOdleglosc)
 # print("Rozkład odległosci zakodowanych słów w formacie {odleglość: liczba wystąpień}")
 # print(rozkladOdleglosci(slowaZakodowane))
-
 
 
 # ---------------------- KODOWANIE SLOWA ----------------------
@@ -191,3 +187,5 @@ print("Slowo po poprawie:\n", poprawione)
 print("Czy teraz jest poprawne?", poprawione == slowoPoprawne)
 
 # ----------------------------------------------------------------------------------------------
+
+# kodowanieMacierza(slowoDoZakodowania, H)
