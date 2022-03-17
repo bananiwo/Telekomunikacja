@@ -16,20 +16,31 @@ matrix = np.ones((k, w))
 
 def initMatrix(k, w, z):
     zeroCounter = 0
-    matrix = np.ones((k, w))
+    matrix = np.ones((w, k))
     for col in range(k):
         for row in range(w):
             if zeroCounter < z:
-                matrix[col, row] = 0
+                matrix[row, col] = 0
                 zeroCounter += 1
     np.random.shuffle(matrix)
     return matrix
 
+def initMatrixWithUnitPart(k, w, z) :
+    zeroCounter = 0
+    unitMatrix = np.identity(w)
+    matrix = np.ones((w, k))
+    for col in range(k):
+        for row in range(w):
+            if zeroCounter < z:
+                matrix[row, col] = 0
+                zeroCounter += 1
+    np.random.shuffle(matrix)
+    matrix[0:w, k-w:k] = unitMatrix
+    return matrix
 
 def shuffleMatrix(matrix):
     np.random.shuffle(matrix)
     return matrix
-
 
 def notSameColToCol(matrix, k):
     same = True
@@ -39,14 +50,6 @@ def notSameColToCol(matrix, k):
                 same = False
                 return same
     return same
-
-
-k = 4
-w = 4
-z = 4
-m = initMatrix(k, w, z)
-loopCounter = 0
-
 
 def ifTwoColsSumNotGiveColInMatrix(matrix, k, w):
     statement = True
@@ -80,7 +83,7 @@ H3 = np.asarray([[1, 0, 1, 0],
                  [0, 1, 1, 0],
                  [0, 0, 0, 0],
                  [0, 0, 0, 1]])
-print(H3[:, 1])
+#print(H3[:, 1])
 
 # print(ifTwoColsSumNotGiveColInMatrix(H2, H2.shape[1], H2.shape[0]))
-print(ifTwoColsSumNotGiveColInMatrix(H3, H3.shape[1], H3.shape[0]))
+#print(ifTwoColsSumNotGiveColInMatrix(H3, H3.shape[1], H3.shape[0]))
