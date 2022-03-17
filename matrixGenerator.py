@@ -1,5 +1,4 @@
 import copy
-
 import numpy as np
 
 # k - ilosc wierszy w macierzy
@@ -42,16 +41,34 @@ def shuffleMatrix(matrix):
     np.random.shuffle(matrix)
     return matrix
 
-def notSameColToCol(matrix, k):
-    same = True
-    for i in range(k):
-        for j in range(i + 1, k):
+def isEachColumnDifferent(matrix):
+    isDifferent = True
+    numOfColumns = len(matrix[0])
+    for i in range(numOfColumns):
+        for j in range(numOfColumns):
+            if i == j:
+                continue
             if np.array_equal(matrix[:, i], matrix[:, j]):
-                same = False
-                return same
-    return same
+                isDifferent = False
+                return isDifferent
 
-def ifTwoColsSumNotGiveColInMatrix(matrix, k, w):
+    return isDifferent
+
+def isEveryColumnNotZero(matrix):
+    isNotZero = True
+    numOfColumns = len(matrix[0])
+    zeros = np.asarray([0] * numOfColumns)
+    for i in range(numOfColumns):
+        if np.array_equal(matrix[:, i], zeros):
+            isNotZero = False
+            break
+
+    return isNotZero
+
+
+def ifTwoColsSumNotGiveColInMatrix(matrix):
+    k = len(matrix)
+    w = len(matrix[0])
     statement = True
     for i in range(k):
         for j in range(k):
@@ -79,7 +96,7 @@ H2 = np.asarray([[1, 0, 0, 0],
                  [0, 0, 1, 0],
                  [0, 0, 0, 1]])
 
-H3 = np.asarray([[1, 0, 1, 0],
+H3 = np.asarray([[0, 0, 1, 0],
                  [0, 1, 1, 0],
                  [0, 0, 0, 0],
                  [0, 0, 0, 1]])
@@ -87,3 +104,38 @@ H3 = np.asarray([[1, 0, 1, 0],
 
 # print(ifTwoColsSumNotGiveColInMatrix(H2, H2.shape[1], H2.shape[0]))
 #print(ifTwoColsSumNotGiveColInMatrix(H3, H3.shape[1], H3.shape[0]))
+
+
+def decToBin(a):
+    bnr = bin(a).replace('0b', '')
+    x = bnr[::-1]  # this reverses an array
+    while len(x) < 8:
+        x += '0'
+        bnr = x[::-1]
+    return bnr
+
+# w zad 2 daje wynik dla parityBitCount >= 4
+def createZad2Matrix(parityBitCount, shouldCorrectTwoBitErrors):
+    matrix = np.zeros((parityBitCount, 8), dtype=int)
+    identityMatrix = np.identity(parityBitCount, dtype=int)
+    matrix = np.hstack((matrix, identityMatrix))
+    for i in range(5000):
+        for row in range(parityBitCount):
+            for col in range(8):
+                matrix[row][col] = np.random.randint(0, 2)
+
+        a = isEachColumnDifferent(matrix)
+        b = ifTwoColsSumNotGiveColInMatrix(matrix)
+        c = isEveryColumnNotZero(matrix) if shouldCorrectTwoBitErrors else True
+        if a and b and c:
+            return matrix
+
+    return np.zeros((parityBitCount, 8 + parityBitCount), dtype=int)
+
+# m = createZad2Matrix(4)
+# print(m)
+# print(ifTwoColsSumNotGiveColInMatrix(m))
+# print(isEveryColumnDifferent(m))
+
+m = createZad2Matrix(4, True)
+print(m)
