@@ -31,17 +31,6 @@ def zakodujJednoSlowo(slowo, H):
 
     return zakodowaneSlowo
 
-# def kodowanieMacierza(slowo, H):
-#     iloscBitowParzystosci = len(H[0]) - 8
-#     zakodowaneSlowo = copy.deepcopy(slowo)
-#     slowoArr = np.pad(np.asarray(slowo), (0, iloscBitowParzystosci), 'constant')
-#
-#     print(slowoArr)
-#     macierzZerowa = np.asarray([0, 0, 0, 0])
-#     slowoArrInv = np.invert(slowoArr)
-#     print(slowoArrInv)
-#
-#     return zakodowaneSlowo
 
 def odleglosc(slowo1, slowo2):
     suma = 0
@@ -125,8 +114,13 @@ def korekcjaPojedynczegoBledu(slowo, H):
     wynik[pozycjaZlegoBitu] = (wynik[pozycjaZlegoBitu] + 1) % 2
     return wynik
 
-def dekodujSlowo(slowo):
-    w = slowo[0:8]
+def dekodujSlowo(slowo, H):
+    if czySlowoZakodowanePoprawnie(slowo):
+        w = copy.deepcopy(slowo)
+    else:
+        w = korekcjaPojedynczegoBledu(slowo, H)
+
+    w = w[0: 8]
     return w
 
 # 256 kolejnych liczb dziesiatkowo
