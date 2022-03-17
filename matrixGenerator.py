@@ -1,3 +1,5 @@
+import copy
+
 import numpy as np
 
 # k - ilosc wierszy w macierzy
@@ -54,10 +56,11 @@ def ifTwoColsSumNotGiveColInMatrix(matrix, k, w):
                 continue
             sumArray = np.empty((w, 1))
             for row in range(w):
-                sumArray[row] = (matrix[row, i] + matrix[row, j]) % 2
-                print(sumArray)
+                sumArray = copy.deepcopy(matrix[:, i]) + matrix[:,j]
             for m in range(k):
                 statement = not np.array_equal(matrix[:, m], sumArray)
+                if not statement:
+                    return statement
     return statement
 
 H = np.asarray([[0, 1, 1, 1, 0, 1, 1, 0, 1, 0, 0, 0],
