@@ -125,6 +125,9 @@ def korekcjaPojedynczegoBledu(slowo, H):
     wynik[pozycjaZlegoBitu] = (wynik[pozycjaZlegoBitu] + 1) % 2
     return wynik
 
+def dekodujSlowo(slowo):
+    w = slowo[0:8]
+    return w
 
 # 256 kolejnych liczb dziesiatkowo
 slowaDec = []
@@ -152,6 +155,7 @@ H = np.asarray([[0, 1, 1, 1, 0, 1, 1, 0,   1, 0, 0, 0],
 
 
 # ---------------------- SPRAWDZENIE MACIERZY H ----------------------
+
 print("\n--- SPRAWDZENIE MACIERZY H ---")
 slowaZakodowane = zakodujSlowa(slowaMatrix, H)
 minOdleglosc = minimalnaOdleglosc(slowaZakodowane)
@@ -188,4 +192,3 @@ print("Czy teraz jest poprawne?", poprawione == slowoPoprawne)
 
 # ----------------------------------------------------------------------------------------------
 
-# kodowanieMacierza(slowoDoZakodowania, H)
