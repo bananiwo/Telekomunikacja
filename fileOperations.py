@@ -1,11 +1,31 @@
-content = open('input.txt', 'r').read()
+def loadStringFromFile(filename):
+    file = open(filename, "r")
+    return file.read()
 
-def textToBinary(content):
-    byteArray = bytearray(content, "utf8")
-    byteList = []
-    for byte in byteArray:
-        singleByte = bin(byte)
-        byteList.append(singleByte)
-    return byteList
+def stringToByteArray(text):
+    wordCount = len(text)
+    output = []
+    for i in range(wordCount):
+        char = text[i]
+        charBin = bin(ord(char)).replace('b', '')
+        charBinArr = []
+        for j in range(len(charBin)):
+            charBinArr.append(int(charBin[j]))
 
-print(textToBinary(content))
+        # jesli zna bitow jest mniej niz 8 to uzupelnia do 8
+        for j in range(8 - len(charBinArr)):
+            charBinArr.insert(0, 0)
+
+        output.append(charBinArr)
+
+    return output
+
+def saveStringToFile(filename, text):
+    file = open(filename, "w")
+    file.write(text)
+    file.close()
+
+
+
+
+
