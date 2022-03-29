@@ -1,16 +1,7 @@
-from matrixGenerator import createZad2Matrix
+from matrixGenerator import createMatrix
 import fileOperations as fo
 import decoding as d
 import numpy as np
-
-# ------------------ ZAKODOWANIE TEKSTU, PODPUNKT 3 ------------------
-
-# matrix = createZad2Matrix(4, False)
-matrix = np.asarray([[1, 1, 0, 0, 1, 1, 1, 1, 1, 0, 0, 0],
-                     [0, 0, 1, 0, 0, 1, 1, 1, 0, 1, 0, 0],
-                     [1, 0, 1, 1, 1, 0, 1, 1, 0, 0, 1, 0],
-                     [1, 1, 1, 1, 0, 0, 0, 1, 0, 0, 0, 1]])
-
 
 
 def encodeFile(matrix):
@@ -19,8 +10,6 @@ def encodeFile(matrix):
     contentBinary = fo.stringToByteArray(content)
     encoded = d.encodeToString(contentBinary, matrix)
     fo.saveStringToFile("encoded", encoded)
-
-# ------------------ ODKODOWANIE TEKSTU, PODPUNKT 3 ------------------
 
 
 def decodeToFile(matrix):
@@ -50,7 +39,31 @@ def decodeToFile(matrix):
         decodedBytesString += wordStr
     output = ''.join(chr(int(''.join(x), 2)) for x in zip(*[iter(decodedBytesString)]*8))
     fo.saveStringToFile("output", output)
-    # print(output)
 
+
+# ----------------- PROBLEM JEDNEGO BLEDNEGO BITU -----------------
+
+matrix = createMatrix(4, False)
+# print(matrix)
+# matrix = np.asarray([[1, 1, 0, 0, 1, 1, 1, 1, 1, 0, 0, 0],
+#                      [0, 0, 1, 0, 0, 1, 1, 1, 0, 1, 0, 0],
+#                      [1, 0, 1, 1, 1, 0, 1, 1, 0, 0, 1, 0],
+#                      [1, 1, 1, 1, 0, 0, 0, 1, 0, 0, 0, 1]])
+#
+#
 # encodeFile(matrix)
-decodeToFile(matrix)
+# decodeToFile(matrix)
+
+# ----------------- PROBLEM DWOCH BLEDNYCH BITOW -----------------
+
+# matrixTwoBadBits = createMatrix(4, True)
+# matrixTwoBadBits = np.asarray([[0, 1, 1, 1, 0, 1, 0, 1, 1, 0, 0, 0],
+#                                [1, 1, 1, 1, 1, 0, 0, 0, 0, 1, 0, 0],
+#                                [0, 0, 1, 1, 1, 1, 1, 0, 0, 0, 1, 0],
+#                                [1, 1, 0, 1, 0, 1, 1, 1, 0, 0, 0, 1]])
+# print(matrixTwoBadBits)
+# textStr = "hello"
+# print(textStr)
+# textBit = fo.stringToByteArray(textStr)
+# print(textBit)
+# textEncoded = d.zakodujSlowo(textBit, matrixTwoBadBits)
