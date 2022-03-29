@@ -12,7 +12,7 @@ def stringToByteArray(text):
         for j in range(len(charBin)):
             charBinArr.append(int(charBin[j]))
 
-        # jesli zna bitow jest mniej niz 8 to uzupelnia do 8
+        # jesli bitow jest mniej niz 8 to uzupelnia do 8
         for j in range(8 - len(charBinArr)):
             charBinArr.insert(0, 0)
 
