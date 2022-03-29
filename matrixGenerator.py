@@ -50,7 +50,8 @@ def isEachColumnDifferent(matrix):
 def isEveryColumnNotZero(matrix):
     isNotZero = True
     numOfColumns = len(matrix[0])
-    zeros = np.asarray([0] * numOfColumns)
+    numOfRows = len(matrix)
+    zeros = np.asarray([0] * numOfRows)
     for i in range(numOfColumns):
         if np.array_equal(matrix[:, i], zeros):
             isNotZero = False
@@ -77,7 +78,7 @@ def ifTwoColsSumNotGiveColInMatrix(matrix):
     return statement
 
 
-def createZad2Matrix(parityBitCount, shouldCorrectTwoBitErrors):
+def createMatrix(parityBitCount, shouldCorrectTwoBitErrors):
     matrix = np.zeros((parityBitCount, 8), dtype=int)
     identityMatrix = np.identity(parityBitCount, dtype=int)
     matrix = np.hstack((matrix, identityMatrix))
@@ -87,8 +88,8 @@ def createZad2Matrix(parityBitCount, shouldCorrectTwoBitErrors):
                 matrix[row][col] = np.random.randint(0, 2)
 
         a = isEachColumnDifferent(matrix)
-        b = ifTwoColsSumNotGiveColInMatrix(matrix)
-        c = isEveryColumnNotZero(matrix) if shouldCorrectTwoBitErrors else True
+        b = isEveryColumnNotZero(matrix)
+        c = ifTwoColsSumNotGiveColInMatrix(matrix) if shouldCorrectTwoBitErrors else True
         if a and b and c:
             return matrix
 
