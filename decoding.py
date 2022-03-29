@@ -100,7 +100,7 @@ def czySlowoZakodowanePoprawnie(slowo, H):
     return wynik
 
 
-def numerBlednejKolumny(slowo, H):
+def numerPojedynczejBlednejKolumny(slowo, H):
     wynik = -1
     macierzHE = np.matmul(H, slowo) % 2
     iloscKolumn = len(H[0])
@@ -114,8 +114,25 @@ def numerBlednejKolumny(slowo, H):
     return wynik
 
 
+def numerPodwojnejBlednejKolumny(slowo, H):
+    wynik = [-1, -1]
+    macierzHE = np.matmul(H, slowo) % 2
+    iloscKolumn = len(H[0])
+    for col1Index in range(iloscKolumn):
+        for col2Index in range(iloscKolumn):
+            if col1Index == col2Index:
+                continue
+
+            sum = slowo[:, col1Index] + slowo[:, col2Index]
+            if sum == macierzHE:
+                wynik = [col1Index, col2Index]
+                break
+
+    return wynik
+
+
 def korekcjaPojedynczegoBledu(slowo, H):
-    pozycjaZlegoBitu = numerBlednejKolumny(slowo, H)
+    pozycjaZlegoBitu = numerPojedynczejBlednejKolumny(slowo, H)
     wynik = copy.deepcopy(slowo)
     wynik[pozycjaZlegoBitu] = (wynik[pozycjaZlegoBitu] + 1) % 2
     return wynik
