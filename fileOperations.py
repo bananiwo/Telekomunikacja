@@ -1,8 +1,11 @@
-def loadStringFromFile(filename):
+def loadStringFromFile(filename):  # zwraca string pobrany z pliku
     file = open(filename, "r")
-    return file.read()
+    content = file.read()
+    file.close()
+    return content
 
-def stringToByteArray(text):
+
+def stringToByteArray(text):  # zwraca tablicę bitów utowrzoną ze stringa
     wordCount = len(text)
     output = []
     for i in range(wordCount):
@@ -20,12 +23,8 @@ def stringToByteArray(text):
 
     return output
 
-def saveStringToFile(filename, text):
+
+def saveStringToFile(filename, text):  # zapisuje string do pliku
     file = open(filename, "w")
     file.write(text)
     file.close()
-
-
-
-
-

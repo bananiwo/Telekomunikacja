@@ -2,77 +2,18 @@
 import copy
 import numpy as np
 
-
-def decToBin(a):
-    bnr = bin(a).replace('0b', '')
-    x = bnr[::-1]
-    while len(x) < 8:
-        x += '0'
-        bnr = x[::-1]
-    return bnr
-
-
-def zakodujSlownik(slowaMatr, H):
-    slowaZakodowaneMatrix = []
-
-    for s in slowaMatr:
-        slowaZakodowaneMatrix.append(zakodujSlowo(s, H))
-
-    return slowaZakodowaneMatrix
-
-
 def zakodujSlowo(slowo, H):
     iloscBitowParzystosci = len(H[0]) - 8
     zakodowaneSlowo = copy.deepcopy(slowo)
     bityParzystosci = [0] * iloscBitowParzystosci  # inicjacja listy zerami
     for i in range(8):
         for j in range(iloscBitowParzystosci):
-            bityParzystosci[j] += slowo[i] * H[j][i]
+            bityParzystosci[j] += slowo[i] * H[j][i] #kazdy z 8 bitow wiadom musi miec operacje z bitow parzystosci
 
     for bp in bityParzystosci:
         zakodowaneSlowo.append(bp % 2)
 
     return zakodowaneSlowo
-
-
-def odleglosc(slowo1, slowo2):
-    suma = 0
-    for i in range(len(slowo1)):
-        suma += abs(slowo1[i] - slowo2[i])
-    return suma
-
-# funkcja do debugowania
-def rozkladOdleglosci(slowa):
-    output = {}
-
-    # stworzenie slownika
-    for i in range(len(slowa[0]) + 1):
-        output[i] = 0
-
-    # wypelnienie slownika 256*256=65536 elementami
-    for i in range(256):
-        for j in range(256):
-            if i == j:
-                continue
-
-            odl = odleglosc(slowa[i], slowa[j])
-            output[odl] += 1
-
-    return output
-
-
-def minimalnaOdleglosc(slowa):
-    minOdleglosc = 8
-
-    for i in range(256):
-        for j in range(256):
-            if i == j:
-                continue
-            odl = odleglosc(slowa[i], slowa[j])
-            if odl < minOdleglosc:
-                minOdleglosc = odl
-
-    return minOdleglosc
 
 
 # zakodowane na sztywno dziala tylko dla 4 bitów parzystości
@@ -89,7 +30,7 @@ def printZakodowanySlownik(slowa):
         counter += 1
 
 
-def czySlowoZakodowanePoprawnie(slowo, H):
+def czySlowoZakodowanePoprawnie(slowo, H): #czy iloczyn jest zerem wg instrukcji
     iloczyn = np.matmul(H, slowo) % 2
     wynik = True
     for bit in iloczyn:
@@ -102,12 +43,12 @@ def czySlowoZakodowanePoprawnie(slowo, H):
 
 def numerPojedynczejBlednejKolumny(slowo, H):
     wynik = -1
-    macierzHE = np.matmul(H, slowo) % 2
+    colInHE = np.matmul(H, slowo) % 2
     iloscKolumn = len(H[0])
     for i in range(iloscKolumn):
         # H[:,i] zwraca i-ta kolumne macierzy H
         # any() zwraca falsz jesli wszystkie elementy macierzy sa 0
-        if not any(macierzHE - H[:, i]):
+        if not any(colInHE - H[:, i]):        #zwroci index gdzie kolumny w slowie i H beda takie same
             wynik = i
             break
 
@@ -116,16 +57,24 @@ def numerPojedynczejBlednejKolumny(slowo, H):
 
 def numerPodwojnejBlednejKolumny(slowo, H):
     wynik = [-1, -1]
-    macierzHE = np.matmul(H, slowo) % 2
+    macierzHE = np.dot(H, slowo) % 2
+    print("he")
+    print(macierzHE)
     iloscKolumn = len(H[0])
     for col1Index in range(iloscKolumn):
         for col2Index in range(iloscKolumn):
             if col1Index == col2Index:
                 continue
 
-            sum = slowo[:, col1Index] + slowo[:, col2Index]
-            if sum == macierzHE:
+            sum = copy.deepcopy(H[:, col1Index]) + copy.deepcopy(H[:, col2Index])
+            sum = sum % 2
+            if np.array_equal(sum, macierzHE):
+                print('col1')
+                print(H[:, col1Index])
+                print('col2')
+                print(H[:, col2Index])
                 wynik = [col1Index, col2Index]
+                print(wynik)
                 break
 
     return wynik
@@ -137,13 +86,22 @@ def korekcjaPojedynczegoBledu(slowo, H):
     wynik[pozycjaZlegoBitu] = (wynik[pozycjaZlegoBitu] + 1) % 2
     return wynik
 
+def korekcjaPodwojnegoBledu(slowo, H):
+    pozycjeZlychBitow = numerPodwojnejBlednejKolumny(slowo, H)
+    wynik = copy.deepcopy(slowo)
+    wynik[pozycjeZlychBitow[0]] = (wynik[pozycjeZlychBitow[0]] + 1) % 2
+    wynik[pozycjeZlychBitow[1]] = (wynik[pozycjeZlychBitow[1]] + 1) % 2
+    return wynik
 
-def dekodujSlowo(slowo, H):
+
+def dekodujSlowo(slowo, H, areThereTwoErrors):
     if czySlowoZakodowanePoprawnie(slowo, H):
         w = copy.deepcopy(slowo)
     else:
-        w = korekcjaPojedynczegoBledu(slowo, H)
-
+        if areThereTwoErrors:
+            w = korekcjaPodwojnegoBledu(slowo, H)
+        if not areThereTwoErrors:
+            w = korekcjaPojedynczegoBledu(slowo, H)
     w = w[0: 8]
     return w
 
