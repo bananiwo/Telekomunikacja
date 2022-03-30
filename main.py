@@ -1,77 +1,55 @@
-import fileOperations
-from matrixGenerator import createMatrix
-import fileOperations as fo
-import decoding as d
+import coding as c
 import numpy as np
+import matrixOperations as mo
+import filesOperations as fo
 
+# matrixOneError = np.asarray([[0, 1, 1, 1, 0, 1, 1, 1, 1, 1, 0, 1, 0, 1],
+#                              [1, 0, 1, 1, 0, 1, 0, 0, 0, 1, 0, 1, 0, 0],
+#                              [1, 1, 0, 1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 0],
+#                              [0, 0, 1, 0, 0, 1, 1, 1, 0, 0, 1, 1, 1, 0],
+#                              [1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 1, 1, 0],
+#                              [1, 1, 0, 1, 1, 1, 0, 1, 0, 0, 1, 0, 0, 1]])
 
-def encodeFile(matrix, encodedFileName, inputFileName):
-    content = open(inputFileName, 'r').read()
-    print(content)
-    contentBinary = fo.stringToByteArray(content)
-    encoded = d.encodeToString(contentBinary, matrix)
-    fo.saveStringToFile(encodedFileName, encoded)
+matrixOneError = np.asarray([[1, 1, 1, 1, 0, 0, 1, 1, 0, 1, 1, 1, 0, 1],
+                             [1, 1, 0, 1, 0, 0, 1, 0, 1, 0, 0, 0, 1, 0],
+                             [1, 1, 0, 0, 1, 0, 0, 1, 0, 1, 1, 0, 1, 1],
+                             [0, 1, 0, 0, 0, 1, 0, 1, 0, 0, 1, 1, 1, 1],1
+                             [0, 1, 1, 0, 0, 0, 1, 1, 1, 0, 1, 1, 0, 0],
+                             [1, 1, 0, 0, 0, 0, 1, 1, 1, 0, 0, 1, 0, 0]])
 
-
-def decodeToFile(matrix, encodedFileName, outputFileName, areThereTwoErrors):
-    encodedWordLen = len(matrix) + 8 # wys = ilosc bitow parzystosci - dlugosc slowa kodowego
-    encodedString = fo.loadStringFromFile(encodedFileName)
-    wordCount = int(len(encodedString)/encodedWordLen)  #ilosc slow
-
-    encodedArray = []
-    for i in range(wordCount):
-        wordStr = encodedString[(encodedWordLen * i): ((i + 1) * encodedWordLen): 1] #wydzielinie slow jako tablica
-        wordArray = []
-        for j in range(encodedWordLen):
-            wordArray.append(int(wordStr[j])) #string cast to int
-        encodedArray.append(wordArray)
-#zakodowe inty w tablicy
-
-    decoded = []
-    while encodedArray:
-        encodedWord = d.dekodujSlowo(encodedArray.pop(0), matrix, areThereTwoErrors)
-        decoded.append(encodedWord)
-
-    decodedBytesString = ""
-    while decoded:
-        word = decoded.pop(0)
-        wordStr = ""
-        for char in word:
-            wordStr += str(char)
-        decodedBytesString += wordStr
-    output = ''.join(chr(int(''.join(x), 2)) for x in zip(*[iter(decodedBytesString)]*8))
-    fo.saveStringToFile(outputFileName, output)
-
-
-# ----------------- PROBLEM JEDNEGO BLEDNEGO BITU -----------------
-
-# matrix = createMatrix(4, False)
-# print(matrix)
-# matrix = np.asarray([[1, 1, 0, 0, 1, 1, 1, 1, 1, 0, 0, 0],
-#                      [0, 0, 1, 0, 0, 1, 1, 1, 0, 1, 0, 0],
-#                      [1, 0, 1, 1, 1, 0, 1, 1, 0, 0, 1, 0],
-#                      [1, 1, 1, 1, 0, 0, 0, 1, 0, 0, 0, 1]])
-
-
-# encodeFile(matrix, 'encoded', 'input.txt')
-# decodeToFile(matrix, 'encoded', 'output.txt', False)
-
-
-
-# ----------------- PROBLEM DWOCH BLEDNYCH BITOW -----------------
-
-# matrixTwoBadBits = createMatrix(6, True)
 matrixTwoBadBits = np.asarray([[1, 1, 1, 0, 0, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0],
-        [1, 1, 0, 1, 1, 1, 1, 0, 0, 1, 0, 0, 0, 0, 0, 0],
-        [1, 0, 1, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 0, 0, 0],
-        [1, 0, 0, 1, 0, 1, 1, 1, 0, 0, 0, 1, 0, 0, 0, 0],
-        [0, 1, 1, 0, 1, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0],
-        [0, 1, 0, 1, 0, 1, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0],
-        [0, 0, 1, 1, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 1, 0],
-        [0, 0, 0, 0, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 1]])
-print(matrixTwoBadBits)
-# encodeFile(matrixTwoBadBits, 'encodedTwoErrors', 'inputTwoErrors.txt')
+                               [1, 1, 0, 1, 1, 1, 1, 0, 0, 1, 0, 0, 0, 0, 0, 0],
+                               [1, 0, 1, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 0, 0, 0],
+                               [1, 0, 0, 1, 0, 1, 1, 1, 0, 0, 0, 1, 0, 0, 0, 0],
+                               [0, 1, 1, 0, 1, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0],
+                               [0, 1, 0, 1, 0, 1, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0],
+                               [0, 0, 1, 1, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 1, 0],
+                               [0, 0, 0, 0, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 1]])
 
-decodeToFile(matrixTwoBadBits, 'encodedTwoErrors', 'outputTwoErrors.txt', True)
-
-
+if __name__ == '__main__':
+    cont = True
+    while cont:
+        print(
+            "Wybierz: \n 1. Zakoduj plik gdy ma 1 bład \n 2. Dekoduj i koryguj plik gdy ma 1 bład \n 3. Zakoduj plik "
+            "gdy ma 2 błędy \n 4. Dekoduj i koryguj plik gdy ma 2 błędy \n 5. Wyjdź")
+        chooseNum = input()
+        if chooseNum == str(1):
+            # matrix = mo.createMatrix(6, False)
+            inputMessage = input()
+            fo.saveStringToFile('input.txt', inputMessage)
+            c.encodeFile(matrixTwoBadBits, 'encoded', 'input.txt')
+        elif chooseNum == str(2):
+            c.decodeToFile(matrixTwoBadBits, 'encoded', 'output.txt', False)
+            print(fo.loadStringFromFile('output.txt'))
+        elif chooseNum == str(3):
+            # matrixTwoBadBits = mo.createMatrix(6, True)
+            inputMessage = input()
+            fo.saveStringToFile('input.txt', inputMessage)
+            c.encodeFile(matrixTwoBadBits, 'encoded', 'input.txt')
+        elif chooseNum == str(4):
+            c.decodeToFile(matrixTwoBadBits, 'encoded', 'output.txt', True)
+            print(fo.loadStringFromFile('output.txt'))
+        elif chooseNum == str(5):
+            cont = False
+        else:
+            print("Zły input")

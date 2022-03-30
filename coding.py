@@ -1,6 +1,7 @@
-# -*- coding: utf-8 -*-
+import filesOperations as fo
 import copy
 import numpy as np
+
 
 def zakodujSlowo(slowo, H):
     iloscBitowParzystosci = len(H[0]) - 8
@@ -14,20 +15,6 @@ def zakodujSlowo(slowo, H):
         zakodowaneSlowo.append(bp % 2)
 
     return zakodowaneSlowo
-
-
-# zakodowane na sztywno dziala tylko dla 4 bitów parzystości
-def printZakodowanySlownik(slowa):
-    counter = 0
-    iloscBitowParzystosci = len(slowa[0]) - 8
-    for slowo in slowa:
-        if iloscBitowParzystosci == 4:
-            print("%3d: [%d, %d, %d, %d, %d, %d, %d, %d,  %d, %d, %d, %d]" % (
-                counter, slowo[0], slowo[1], slowo[2], slowo[3], slowo[4], slowo[5], slowo[6], slowo[7], slowo[8],
-                slowo[9],
-                slowo[10], slowo[11]))
-
-        counter += 1
 
 
 def czySlowoZakodowanePoprawnie(slowo, H): #czy iloczyn jest zerem wg instrukcji
@@ -114,3 +101,40 @@ def encodeToString(binaryContent, H):
         output += wordStr
 
     return output
+
+
+def encodeFile(matrix, encodedFileName, inputFileName):
+    content = open(inputFileName, 'r').read()
+    print(content)
+    contentBinary = fo.stringToByteArray(content)
+    encoded = encodeToString(contentBinary, matrix)
+    fo.saveStringToFile(encodedFileName, encoded)
+
+
+def decodeToFile(matrix, encodedFileName, outputFileName, areThereTwoErrors):
+    encodedWordLen = len(matrix) + 8 # wys = ilosc bitow parzystosci - dlugosc slowa kodowego
+    encodedString = fo.loadStringFromFile(encodedFileName)
+    wordCount = int(len(encodedString)/encodedWordLen)  #ilosc slow
+
+    encodedArray = []
+    for i in range(wordCount):
+        wordStr = encodedString[(encodedWordLen * i): ((i + 1) * encodedWordLen): 1] #wydzielinie slow jako tablica
+        wordArray = []
+        for j in range(encodedWordLen):
+            wordArray.append(int(wordStr[j])) #string cast to int
+        encodedArray.append(wordArray)
+
+    decoded = []
+    while encodedArray:
+        encodedWord = dekodujSlowo(encodedArray.pop(0), matrix, areThereTwoErrors)
+        decoded.append(encodedWord)
+
+    decodedBytesString = ""
+    while decoded:
+        word = decoded.pop(0)
+        wordStr = ""
+        for char in word:
+            wordStr += str(char)
+        decodedBytesString += wordStr
+    output = ''.join(chr(int(''.join(x), 2)) for x in zip(*[iter(decodedBytesString)]*8))
+    fo.saveStringToFile(outputFileName, output)

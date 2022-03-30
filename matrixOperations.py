@@ -1,14 +1,5 @@
-import copy
-
-import numpy
 import numpy as np
-# 1) kolumny nie moga byc takie same
-# 2) suma kolumn nie moze dac kolumny macierzy (tylko do 2 bledow)
-# 3) kolumna nie moze byc kolna zerowa
-
-def shuffleMatrix(matrix):
-    np.random.shuffle(matrix)
-    return matrix
+import copy
 
 
 def isEachColumnDifferent(matrix):  # zwraca wartość logiczną true jesli w każda kolumna macierzy jest unikalna
@@ -45,29 +36,22 @@ def sumOfColsNotGiveCol(matrix):
             matrix = copy.deepcopy(matrix)
             sumOfTwoCols = (matrix[:, i] + matrix[:, j]) % 2
             for k in range(colNum):
-                if numpy.array_equal(sumOfTwoCols, matrix[:,k]):
+                if np.array_equal(sumOfTwoCols, matrix[:,k]):
                     return False
     return True
 
 
 def createMatrix(parityBitCount, shouldCorrectTwoBitErrors):
     matrix = np.zeros((parityBitCount, 8+parityBitCount), dtype=int)
-    # identityMatrix = np.identity(parityBitCount, dtype=int)
-    # matrix = np.hstack((zeros, identityMatrix))
     for i in range(50000):
         for row in range(parityBitCount):
-            # for col in range(8):
             for col in range(8+parityBitCount):
                 matrix[row][col] = np.random.randint(0, 2)
 
         a = isEachColumnDifferent(matrix)
         b = isEveryColumnNotZero(matrix)
-        # if shouldCorrectTwoBitErrors:
-        # c = ifTwoColsSumNotGiveColInMatrix(matrix)
-        # else:
-        #     c = True
         c = sumOfColsNotGiveCol(matrix) if shouldCorrectTwoBitErrors else True
-        # c = not c
+
         if a and b and c:
             return matrix
 
