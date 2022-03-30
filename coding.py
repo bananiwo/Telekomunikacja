@@ -3,100 +3,93 @@ import copy
 import numpy as np
 
 
-def zakodujSlowo(slowo, H):
-    iloscBitowParzystosci = len(H[0]) - 8
-    zakodowaneSlowo = copy.deepcopy(slowo)
-    bityParzystosci = [0] * iloscBitowParzystosci  # inicjacja listy zerami
+def encodeSingleWord(word, H):
+    parityBitCount = len(H[0]) - 8
+    encodedWord = copy.deepcopy(word)
+    parityBits = [0] * parityBitCount  # inicjacja listy zerami
     for i in range(8):
-        for j in range(iloscBitowParzystosci):
-            bityParzystosci[j] += slowo[i] * H[j][i] #kazdy z 8 bitow wiadom musi miec operacje z bitow parzystosci
+        for j in range(parityBitCount):
+            parityBits[j] += word[i] * H[j][i] #kazdy z 8 bitow wiadom musi miec operacje z bitow parzystosci
 
-    for bp in bityParzystosci:
-        zakodowaneSlowo.append(bp % 2)
+    for pb in parityBits:
+        encodedWord.append(pb % 2)
 
-    return zakodowaneSlowo
+    return encodedWord
 
 
-def czySlowoZakodowanePoprawnie(slowo, H): #czy iloczyn jest zerem wg instrukcji
-    iloczyn = np.matmul(H, slowo) % 2
-    wynik = True
+def isWordEncodedCorrectly(word, H): #czy iloczyn jest zerem wg instrukcji
+    iloczyn = np.matmul(H, word) % 2
+    result = True
     for bit in iloczyn:
         if bit == 1:
-            wynik = False
+            result = False
             break
 
-    return wynik
+    return result
 
 
-def numerPojedynczejBlednejKolumny(slowo, H):
-    wynik = -1
+def singleIncorrectBitIndex(slowo, H):
+    result = -1
     colInHE = np.matmul(H, slowo) % 2
-    iloscKolumn = len(H[0])
-    for i in range(iloscKolumn):
+    columnCount = len(H[0])
+    for i in range(columnCount):
         # H[:,i] zwraca i-ta kolumne macierzy H
         # any() zwraca falsz jesli wszystkie elementy macierzy sa 0
         if not any(colInHE - H[:, i]):        #zwroci index gdzie kolumny w slowie i H beda takie same
-            wynik = i
+            result = i
             break
 
-    return wynik
+    return result
 
 
-def numerPodwojnejBlednejKolumny(slowo, H):
-    wynik = [-1, -1]
-    macierzHE = np.dot(H, slowo) % 2
-    print("he")
-    print(macierzHE)
-    iloscKolumn = len(H[0])
-    for col1Index in range(iloscKolumn):
-        for col2Index in range(iloscKolumn):
+def doubleIncorrectBitsIndexes(slowo, H):
+    result = [-1, -1]
+    matrixHE = np.dot(H, slowo) % 2
+    columnCount = len(H[0])
+    for col1Index in range(columnCount):
+        for col2Index in range(columnCount):
             if col1Index == col2Index:
                 continue
 
             sum = copy.deepcopy(H[:, col1Index]) + copy.deepcopy(H[:, col2Index])
             sum = sum % 2
-            if np.array_equal(sum, macierzHE):
-                print('col1')
-                print(H[:, col1Index])
-                print('col2')
-                print(H[:, col2Index])
-                wynik = [col1Index, col2Index]
-                print(wynik)
+            if np.array_equal(sum, matrixHE):
+                result = [col1Index, col2Index]
                 break
 
-    return wynik
+    return result
 
 
-def korekcjaPojedynczegoBledu(slowo, H):
-    pozycjaZlegoBitu = numerPojedynczejBlednejKolumny(slowo, H)
-    wynik = copy.deepcopy(slowo)
-    wynik[pozycjaZlegoBitu] = (wynik[pozycjaZlegoBitu] + 1) % 2
-    return wynik
+def correctionOfSingleBitInWord(word, H):
+    incorrectBitIndex = singleIncorrectBitIndex(word, H)
+    result = copy.deepcopy(word)
+    result[incorrectBitIndex] = (result[incorrectBitIndex] + 1) % 2
+    return result
 
-def korekcjaPodwojnegoBledu(slowo, H):
-    pozycjeZlychBitow = numerPodwojnejBlednejKolumny(slowo, H)
-    wynik = copy.deepcopy(slowo)
-    wynik[pozycjeZlychBitow[0]] = (wynik[pozycjeZlychBitow[0]] + 1) % 2
-    wynik[pozycjeZlychBitow[1]] = (wynik[pozycjeZlychBitow[1]] + 1) % 2
-    return wynik
+def correctionOfDoubleBitsInWord(word, H):
+    incorrectBitsIndexes = doubleIncorrectBitsIndexes(word, H)
+    result = copy.deepcopy(word)
+    result[incorrectBitsIndexes[0]] = (result[incorrectBitsIndexes[0]] + 1) % 2
+    result[incorrectBitsIndexes[1]] = (result[incorrectBitsIndexes[1]] + 1) % 2
+    return result
 
 
-def dekodujSlowo(slowo, H, areThereTwoErrors):
-    if czySlowoZakodowanePoprawnie(slowo, H):
-        w = copy.deepcopy(slowo)
+def decodeWord(word, H, areThereTwoErrors):
+    if isWordEncodedCorrectly(word, H):
+        result = copy.deepcopy(word)
     else:
         if areThereTwoErrors:
-            w = korekcjaPodwojnegoBledu(slowo, H)
+            result = correctionOfDoubleBitsInWord(word, H)
         if not areThereTwoErrors:
-            w = korekcjaPojedynczegoBledu(slowo, H)
-    w = w[0: 8]
-    return w
+            result = correctionOfSingleBitInWord(word, H)
+    result = result[0: 8]
+    return result
 
 
 def encodeToString(binaryContent, H):
     output = ""
     while binaryContent:
-        wordArr = zakodujSlowo(binaryContent.pop(0), H)
+        wordArr = encodeSingleWord(binaryContent.pop(0), H)
         wordStr = ''.join([str(elem) for elem in wordArr])
         output += wordStr
 
@@ -126,7 +119,7 @@ def decodeToFile(matrix, encodedFileName, outputFileName, areThereTwoErrors):
 
     decoded = []
     while encodedArray:
-        encodedWord = dekodujSlowo(encodedArray.pop(0), matrix, areThereTwoErrors)
+        encodedWord = decodeWord(encodedArray.pop(0), matrix, areThereTwoErrors)
         decoded.append(encodedWord)
 
     decodedBytesString = ""
