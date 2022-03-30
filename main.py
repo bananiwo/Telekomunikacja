@@ -61,25 +61,17 @@ def decodeToFile(matrix, encodedFileName, outputFileName, areThereTwoErrors):
 # ----------------- PROBLEM DWOCH BLEDNYCH BITOW -----------------
 
 # matrixTwoBadBits = createMatrix(6, True)
-matrixTwoBadBits = np.asarray([[0, 0, 1, 0, 1, 1, 1, 0, 0, 0, 0, 1, 1, 1],
-                               [1, 0, 0, 1, 0, 1, 1, 0, 0, 0, 1, 0, 1, 1],
-                               [0, 1, 0, 0, 0, 1, 1, 1, 1, 1, 0, 0, 1, 1],
-                               [1, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 1, 1],
-                               [1, 0, 1, 1, 0, 0, 1, 1, 0, 0, 0, 1, 0, 1],
-                               [0, 1, 1, 0, 1, 0, 0, 0, 1, 0, 1, 1, 1, 0]])
+matrixTwoBadBits = np.asarray([[1, 1, 1, 0, 0, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0],
+        [1, 1, 0, 1, 1, 1, 1, 0, 0, 1, 0, 0, 0, 0, 0, 0],
+        [1, 0, 1, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 0, 0, 0],
+        [1, 0, 0, 1, 0, 1, 1, 1, 0, 0, 0, 1, 0, 0, 0, 0],
+        [0, 1, 1, 0, 1, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0],
+        [0, 1, 0, 1, 0, 1, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0],
+        [0, 0, 1, 1, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 1, 0],
+        [0, 0, 0, 0, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 1]])
 print(matrixTwoBadBits)
-# textStr = "hello"
-# print(textStr)
-# textBit = fo.stringToByteArray(textStr)
-# print(textBit)
-# textEncoded = []
-# while textBit:
-#     textEncoded.append(d.zakodujSlowo(textBit.pop(0), matrixTwoBadBits))
-# print(textEncoded)
 # encodeFile(matrixTwoBadBits, 'encodedTwoErrors', 'inputTwoErrors.txt')
-#
+
 decodeToFile(matrixTwoBadBits, 'encodedTwoErrors', 'outputTwoErrors.txt', True)
-
-
 
 
